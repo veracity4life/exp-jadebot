@@ -1,0 +1,8 @@
+{
+    "introductions": [
+        "[%name%] is the name",
+        "name is [%name%]",
+        "call me [%name%]",
+        "I am [%name%]"
+    ]
+}
