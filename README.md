@@ -9,7 +9,7 @@ _Coming soon..._
 
 ## Version History
 
-** version 0.0.4 **
+**version 0.0.4**
 * Initial commit of code
 * Creation of folder structure
 * Set up of package.json
