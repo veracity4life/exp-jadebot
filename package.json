@@ -4,23 +4,19 @@
   "description": "Machine learning and Neural networks implemented simply",
   "main": "init.js",
   "scripts": {
-    "test": "console.log('Jadebot reporting for duty');"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/veracity4life/exp-jadebot.git"
   },
   "keywords": [
-    "machine",
     "learning",
-    "js",
-    "ai",
-    "neural",
-    "networks",
-    "pattern",
-    "recognition",
-    "conversation",
-    "javascript"
+    "neural-networks",
+    "patterns",
+    "network",
+    "javascript",
+    "bot",
+    "jadebot"
   ],
   "author": "Michael Russell (@veracity4life)",
   "license": "MIT",
@@ -31,5 +27,10 @@
   "dependencies": {
     "es6-shim": "^0.35.0",
     "lodash": "^4.11.1"
+  },
+  "devDependencies": {
+    "gulp": "^3.9.1",
+    "gulp-jshint": "^2.0.0",
+    "jshint": "^2.9.1"
   }
 }
