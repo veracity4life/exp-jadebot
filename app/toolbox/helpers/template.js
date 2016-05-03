@@ -21,7 +21,7 @@ function templateMatch(params) {
         return console.error("Error: " + e);
     }
 
-    return findTempalte = {
+    return findTemplate = {
         results: {
             input: '',
             template: '',
@@ -70,7 +70,6 @@ function templateMatch(params) {
                             subP += (1/w.length);
                         }
                     }
-                    // console.debug({row:row, i:i, value:value, subW:subW, subP:subP});
                 });
 
                 if(subW > percentWords) {
