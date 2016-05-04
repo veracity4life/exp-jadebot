@@ -13,7 +13,9 @@ function botAPI(params) {
     let bot_obj = {};
     let bot_name = params.name || 'Jadebot',
         bot_exp = 0.00,
-        bot_conversation = [];
+        bot_conversation = params.conversation || [];
+
+    let currentContext = {};
 
     return bot_obj = {
         order: function (args) {
@@ -33,7 +35,7 @@ function botAPI(params) {
             let fn = args.fn || 'actionError',
                 options = args.options || {};
 
-            if (fn === 'actionNotFound')
+            if (fn === 'actionError')
                 options = {'msg': "Action not found or error executing."};
 
             return this[fn](options);
@@ -55,8 +57,45 @@ function botAPI(params) {
 
             return this.getBotExp();
         },
-        createConversation: function () {
-            
+        converse: function (args) {
+            let response = currentContext.recipient + ", how may I help you?";
+
+            if (_.isString(args)) {
+                this.addToConversation([currentContext.recipient, args]);
+            }
+
+            if (currentContext.conversationID === undefined) {
+                response = this.beginConversation();
+            }
+
+            return response;
+        },
+        beginConversation: function () {
+            let conv = {};
+
+            conv.recipient = undefined;
+            conv.memory = [{
+                'author': bot_name,
+                'msg': 'Hello my name is ' + bot_name + ', how may I be of assistance?'
+            }];
+
+            bot_conversation.push(conv);
+            currentContext.recipient = conv.recipient;
+            currentContext.conversationID = bot_conversation.length-1;
+            return conv.memory[0].msg;
+        },
+        addToConversation: function (args) {
+            let memoryItem = {};
+
+            memoryItem = {
+                'author': args[0],
+                'msg': args[1]
+            };
+
+            bot_conversation[currentContext.conversationID].memory.push(memoryItem);
+        },
+        getConversation: function () {
+            return console.debug(bot_conversation);
         }
     };
 }
