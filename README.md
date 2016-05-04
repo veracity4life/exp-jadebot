@@ -6,7 +6,7 @@ _Coming soon..._
 
 ## Implementation
 
-For _template.js_ being used as template recognition.
+Using ```template.js``` for template recognition.
 ```
 let results = {};
 let temp = templateMatch({
@@ -18,6 +18,19 @@ let temp = templateMatch({
 temp.getMatchingTemplate();
 results = temp.getResults();
 ```
+And then your results will have the following information avialable.
+```
+results = {
+    'input': 'string',
+    'templateId': 0,
+    'template': 'string',
+    'isMatch': true,
+    'confidence': 0.93
+}
+```
+
+## License
+The MIT License
 
 ## Version History
 
