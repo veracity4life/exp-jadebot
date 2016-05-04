@@ -3,6 +3,8 @@ function templateMatch(params) {
 
     params = params || {};
 
+    let findTemplate = {};
+
     let percentTarget,
         percentWords = 0.00,
         percentPos = 0.00,
@@ -24,6 +26,7 @@ function templateMatch(params) {
     return findTemplate = {
         results: {
             input: '',
+            templateId: 0,
             template: '',
             isMatch: false,
             confidence: 0.00
@@ -49,7 +52,8 @@ function templateMatch(params) {
             return templates;
         },
         getMatchingTemplate: function () {
-            let sWords = _.split(_.toLower(input), ' ');
+            let sWords = _.split(_.toLower(input), ' '),
+                scope = this;
 
             _.map(templates, function (row) {
                 let w = _.split(row, ' '),
@@ -75,7 +79,8 @@ function templateMatch(params) {
                 if(subW > percentWords) {
                     percentWords = subW;
                     percentPos = subP;
-                    this.results.template = row;
+                    scope.results.template = row;
+                    scope.results.templateId = _.indexOf(templates, row);
                     
                     if(w.length != sWords.length) {
                         percentWords = percentWords * (0.85);
@@ -83,10 +88,10 @@ function templateMatch(params) {
                 }
             });
 
-            this.results.confidence = _.round((percentWords * 0.6) + (percentPos * 0.4), 4);
+            scope.results.confidence = _.round((percentWords * 0.6) + (percentPos * 0.4), 4);
 
-            if(this.results.confidence >= target)
-                this.results.isMatch = true;
+            if(scope.results.confidence >= percentTarget)
+                scope.results.isMatch = true;
         },
         getResults: function () {
             return this.results;
