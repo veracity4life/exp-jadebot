@@ -3,7 +3,7 @@ function botAPI(params) {
 
     params = params || {};
 
-    const bot_VERSION = '0.1.0';
+    const bot_VERSION = '0.1.1';
     const bot_REGEX = function () {
         return {
             'order': new RegExp('(' + bot_name + ')[,\\s]+(\\S+)[,\\s]*([\\S+\\s]*)')
@@ -25,7 +25,9 @@ function botAPI(params) {
         ]
     };
 
-    let bot_obj = {};
+    let bot_obj = {},
+        bot_methods = {};
+
     let bot_name = params.name || 'Jadebot',
         bot_exp = 0.00,
         bot_conversation = params.conversation || [];
@@ -36,79 +38,94 @@ function botAPI(params) {
         let fn = args.fn || 'actionError',
             options = args.options || {};
 
-        if (fn === 'actionError')
+        if (fn === 'actionError') {
             options = {'msg': "Action not found or error executing."};
+            return actionError(options);
+        }
 
-        return [fn](options);
+        return bot_methods[fn](options);
     }
 
     function actionError(args) {
         return console.error(args.msg);
     }
 
-    function getBotExp() {
-        return bot_exp;
-    }
+    bot_methods = {
+        getBotExp: function () {
+            return bot_exp;
+        },
 
-    function updateBotExp(args) {
-        if (args[0] == 'set')
-            bot_exp = _.toNumber(args[1]);
+        updateBotExp: function (args) {
+            if (args[0] == 'set')
+                bot_exp = _.toNumber(args[1]);
 
-        if (args[0] == 'update')
-            bot_exp += _.toNumber(args[1]);
+            if (args[0] == 'update')
+                bot_exp += _.toNumber(args[1]);
 
-        bot_exp = _.round(bot_exp, 2);
+            bot_exp = _.round(bot_exp, 2);
 
-        return getBotExp();
-    }
+            return getBotExp();
+        },
 
-    function beginConversation() {
-        let conv = {};
+        beginConversation: function () {
+            let conv = {};
 
-        conv.recipient = undefined;
-        conv.memory = [{
-            'author': bot_name,
-            'msg': 'Hello my name is ' + bot_name + ', how may I be of assistance?'
-        }];
+            conv.recipient = undefined;
+            conv.memory = [{
+                'author': bot_name,
+                'msg': 'Hello my name is ' + bot_name + ', how may I be of assistance?'
+            }];
 
-        bot_conversation.push(conv);
-        currentContext.recipient = conv.recipient;
-        currentContext.conversationID = bot_conversation.length-1;
-        return conv.memory[0].msg;
-    }
+            bot_conversation.push(conv);
+            currentContext.recipient = conv.recipient;
+            currentContext.conversationID = bot_conversation.length-1;
+            return conv.memory[0].msg;
+        },
 
-    function addToConversation(args) {
-        let memoryItem = {};
+        addToConversation: function (args) {
+            let memoryItem = {};
 
-        memoryItem = {
-            'author': args[0],
-            'msg': args[1]
-        };
+            memoryItem = {
+                'author': args[0],
+                'msg': args[1]
+            };
 
-        bot_conversation[currentContext.conversationID].memory.push(memoryItem);
-    }
+            bot_conversation[currentContext.conversationID].memory.push(memoryItem);
+        },
 
-    function replyToConversation(args) {
-        let results = {},
-            response = 'I could not find a template match for a proper response.';
-        let temp = templateMatch({
-            'string': args,
-            'templates': definedResponses.templates,
-            'confidence': 0.75
-        });
+        replyToConversation: function (args) {
+            let results = {},
+                response = 'I could not find a template match for a proper response.';
+            let temp = templateMatch({
+                'string': args,
+                'templates': definedResponses.templates,
+                'confidence': 0.75
+            });
 
-        temp.getMatchingTemplate();
-        results = temp.getResults();
+            temp.getMatchingTemplate();
+            results = temp.getResults();
 
-        if (results.isMatch)
-            response = definedResponses.responses[results.templateId];
+            if (results.isMatch)
+                response = definedResponses.responses[results.templateId];
 
-        return response;
-    }
+            return response;
+        },
 
-    function getConversation() {
-        return console.debug(bot_conversation);
-    }
+        getConversation: function () {
+            return console.debug(bot_conversation);
+        },
+
+        addToTemplates: function (args) {
+            if(_.isArray(args) && args.length == 2) {
+                definedResponses.templates.push(args[0]);
+                definedResponses.responses.push(args[1]);
+            }
+        },
+
+        getTemplates: function () {
+            return console.debug(definedResponses);
+        }
+    };
 
     return bot_obj = {
         order: function (args) {
@@ -123,17 +140,26 @@ function botAPI(params) {
                     'options': _.split(matches[3], /[,\s]+/)
                 })
             }
+
+            if(_.isArray(args)) {
+                let matches = args[0].match(bot_REGEX().order);
+
+                return actionExecute({
+                    'fn': matches[2],
+                    'options': _.drop(args, 1)
+                })
+            }
         },
         converse: function (args) {
             let response = currentContext.recipient + ", how may I help you?";
 
             if (currentContext.conversationID === undefined) {
-                return response = beginConversation();
+                return response = bot_methods.beginConversation();
             }
 
             if (_.isString(args)) {
-                addToConversation([currentContext.recipient, args]);
-                return response = replyToConversation(args);
+                bot_methods.addToConversation([currentContext.recipient, args]);
+                return response = bot_methods.replyToConversation(args);
             }
 
             return response;
