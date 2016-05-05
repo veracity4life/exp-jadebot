@@ -43,7 +43,7 @@ function neuralnet(params) {
 
         _.forEach(trainingInputs[index], function (value, key) {
             weights[key] += value * adjustment;
-        }); 
+        });
     }
 
     function trainingProcess() {
@@ -102,15 +102,6 @@ function neuralnet(params) {
                 trainingProcess();
                 iterations -= 1;
             } while (iterations > 0)
-        },
-        getOutput : function () {
-            return outputVal;
-        },
-        getWeights : function () {
-            return weights;
-        },
-        setWeight : function (args) {
-            weights[args[0]] = args[1];
         },
         testNewInput: function (input) {
             return getOutputFrom(input);
